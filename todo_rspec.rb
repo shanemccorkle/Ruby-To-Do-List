@@ -112,10 +112,10 @@ describe "ToDoList" do
     item2 = ToDoItemWithDate.new("18-4-23", "Title 2", "Description 2")
     item3 = ToDoItemWithDate.new("18-12-23", "Title 3", "Description 3")
     item3.change_due_date("2016-8-26")
-    to_do_with_date_list.add_item_to_list(item1)
-    to_do_with_date_list.add_item_to_list(item2)
-    to_do_with_date_list.add_item_to_list(item3)
-    expect(to_do_with_date_list.to_do_items.length).to eq(3)
+    to_do_with_date_list.add_item_to_with_date(item1)
+    to_do_with_date_list.add_item_to_with_date(item2)
+    to_do_with_date_list.add_item_to_with_date(item3)
+    expect(to_do_with_date_list.to_do_with_date.length).to eq(3)
     expect(item1.print_item).to eq("Title: Title 1; Description: Description 1; Is Done: false; Due Date: 2016-02-24")
     expect(item2.print_item).to eq("Title: Title 2; Description: Description 2; Is Done: false; Due Date: 2018-04-23")
     expect(item3.print_item).to eq("Title: Title 3; Description: Description 3; Is Done: false; Due Date: 2016-08-26")
@@ -133,10 +133,10 @@ describe "ToDoList" do
     item1.change_due_date(Date.today.to_s)
     item3.change_due_date(Date.today.to_s)
     item4.change_due_date(Date.today.to_s)
-    to_do_with_date_list.add_item_to_list(item1)
-    to_do_with_date_list.add_item_to_list(item2)
-    to_do_with_date_list.add_item_to_list(item3)
-    to_do_with_date_list.add_item_to_list(item4)
+    to_do_with_date_list.add_item_to_with_date(item1)
+    to_do_with_date_list.add_item_to_with_date(item2)
+    to_do_with_date_list.add_item_to_with_date(item3)
+    to_do_with_date_list.add_item_to_with_date(item4)
 
     expect(to_do_with_date_list.not_completed_due_today).to eq([item1, item3, item4])
   end
@@ -148,10 +148,10 @@ describe "ToDoList" do
     item2 = ToDoItemWithDate.new("18-4-23", "Title 2", "Description 2")
     item3 = ToDoItemWithDate.new("18-12-23", "Title 3", "Description 3")
     item4 = ToDoItemWithDate.new("16-2-11", "Title 4", "Description 4")
-    to_do_with_date_list.add_item_to_list(item1)
-    to_do_with_date_list.add_item_to_list(item2)
-    to_do_with_date_list.add_item_to_list(item3)
-    to_do_with_date_list.add_item_to_list(item4)
+    to_do_with_date_list.add_item_to_with_date(item1)
+    to_do_with_date_list.add_item_to_with_date(item2)
+    to_do_with_date_list.add_item_to_with_date(item3)
+    to_do_with_date_list.add_item_to_with_date(item4)
 
     expect(to_do_with_date_list.not_complete_by_date).to eq([item4, item1, item2, item3])
   end
@@ -165,14 +165,14 @@ describe "ToDoList" do
     item4 = ToDoItemWithDate.new("16-2-11", "Title 4", "Description 4")
     item5 = ToDoItem.new("Title 5", "Description 5")
     item6 = ToDoItem.new("Title 6", "Description 6")
-    to_do_list.add_item_to_list(item1)
-    to_do_list.add_item_to_list(item2)
-    to_do_list.add_item_to_list(item3)
-    to_do_list.add_item_to_list(item4)
+    to_do_list.add_item_to_with_date(item1)
+    to_do_list.add_item_to_with_date(item2)
+    to_do_list.add_item_to_with_date(item3)
+    to_do_list.add_item_to_with_date(item4)
     to_do_list.add_item_to_list(item5)
     to_do_list.add_item_to_list(item6)
 
-    expect(to_do_list.organized_by_date).to eq([item4, item1, item2, item3, item5, item6])
+    expect(to_do_list.show_not_completed_by_date_first).to eq([item4, item1, item2, item3, item5, item6])
   end
 
 end
@@ -197,6 +197,76 @@ describe "ToDoItemWithDate" do
     new_item.mark_as_done
     new_item.change_due_date("2016-03-24")
     expect(new_item.print_item).to eq("Title: Title 1; Description: Description 1; Is Done: true; Due Date: 2016-03-24")
+  end
+
+end
+
+describe "AnniversaryItems" do
+
+  # Story: As a developer, I can create a to do item for an anniversary (a yearly recurring event) .
+  it "can create anniversary item" do
+    expect{AnniversaryItems.new(5, 18, "Title 1","Description")}.to_not raise_error
+  end
+
+  # Story: As a developer, I can print an item for an anniversary with field labels and values.
+  it "can display an anniversary with labels" do
+    new_item = AnniversaryItems.new(10, 7, "Title 1", "Description 1")
+    expect(new_item.print_item).to eq("Title: Title 1; Description: Description 1; Anniversary Date: 10/7")
+
+  end
+
+  # As a developer, I can add anniversary items to a list and print those items
+  it "can add anniversary items to the list" do
+    to_do_list = ToDoList.new
+    item7 = AnniversaryItems.new(2, 25, "Title 7", "Description 7")
+    item8 = AnniversaryItems.new(3, 4, "Title 8", "Description 8")
+    to_do_list.add_anniversary_item(item7)
+    to_do_list.add_anniversary_item(item8)
+    expect(to_do_list.anniversary_items.length).to eq(2)
+  end
+
+  # Story: As a developer with a ToDoList with and without due dates and yearly recurring dates, I can list all the not completed items in order of due date and yearly dates for the current month.
+  it "can list all not completed items by due date and yearly dates for current month excluding due date items" do
+    to_do_list = ToDoList.new
+    item1 = ToDoItemWithDate.new("2016-02-24", "Title 1", "Description 1")
+    item2 = ToDoItemWithDate.new("18-4-23", "Title 2", "Description 2")
+    item3 = ToDoItemWithDate.new("18-12-23", "Title 3", "Description 3")
+    item4 = ToDoItemWithDate.new("16-2-11", "Title 4", "Description 4")
+    item5 = ToDoItem.new("Title 5", "Description 5")
+    item6 = ToDoItem.new("Title 6", "Description 6")
+    item7 = AnniversaryItems.new(2, 25, "Title 7", "Description 7")
+    item8 = AnniversaryItems.new(3, 4, "Title 8", "Description 8")
+    to_do_list.add_item_to_with_date(item1)
+    to_do_list.add_item_to_with_date(item2)
+    to_do_list.add_item_to_with_date(item3)
+    to_do_list.add_item_to_with_date(item4)
+    to_do_list.add_item_to_list(item5)
+    to_do_list.add_item_to_list(item6)
+    to_do_list.add_anniversary_item(item7)
+    to_do_list.add_anniversary_item(item8)
+    expect(to_do_list.list_not_completed_this_month_date_only).to eq([item4, item1, item7])
+  end
+
+  # As a developer with a ToDoList with a collection of items with and without due dates and yearly recurring dates, I can list all the not completed items in order of due date and yearly dates for the current month, then the items without due dates.
+  it "can list all not completed items by due date and yearly dates for current month including non due date items" do
+    to_do_list = ToDoList.new
+    item1 = ToDoItemWithDate.new("2016-02-24", "Title 1", "Description 1")
+    item2 = ToDoItemWithDate.new("18-4-23", "Title 2", "Description 2")
+    item3 = ToDoItemWithDate.new("18-12-23", "Title 3", "Description 3")
+    item4 = ToDoItemWithDate.new("16-2-11", "Title 4", "Description 4")
+    item5 = ToDoItem.new("Title 5", "Description 5")
+    item6 = ToDoItem.new("Title 6", "Description 6")
+    item7 = AnniversaryItems.new(2, 25, "Title 7", "Description 7")
+    item8 = AnniversaryItems.new(3, 4, "Title 8", "Description 8")
+    to_do_list.add_item_to_with_date(item1)
+    to_do_list.add_item_to_with_date(item2)
+    to_do_list.add_item_to_with_date(item3)
+    to_do_list.add_item_to_with_date(item4)
+    to_do_list.add_item_to_list(item5)
+    to_do_list.add_item_to_list(item6)
+    to_do_list.add_anniversary_item(item7)
+    to_do_list.add_anniversary_item(item8)
+    expect(to_do_list.list_all_not_completed_this_month).to eq([item4, item1, item7, item5, item6])
   end
 
 end
